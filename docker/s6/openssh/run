@@ -5,4 +5,11 @@ if test -f ./setup; then
     source ./setup
 fi
 
+# Generate SSH host keys on first start when the data volume is empty.
+if [ ! -f /data/ssh/ssh_host_ed25519_key ]; then
+    ssh-keygen -t rsa -b 4096 -f /data/ssh/ssh_host_rsa_key -N "" > /dev/null 2>&1
+    ssh-keygen -t ecdsa -b 521 -f /data/ssh/ssh_host_ecdsa_key -N "" > /dev/null 2>&1
+    ssh-keygen -t ed25519 -f /data/ssh/ssh_host_ed25519_key -N "" > /dev/null 2>&1
+fi
+
 exec gosu root /usr/sbin/sshd -D -f /app/gogs/docker/sshd_config
